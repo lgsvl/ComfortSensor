@@ -45,6 +45,44 @@ Example sensor config JSON:
 }
 ```
 
+# Python API example
+
+Sensor will be calling `custom` callback in Python API with `kind` set to `comfort`.
+Here is an example of Python API using this callback:
+
+```python
+#!/usr/bin/env python3
+
+import os
+import lgsvl
+
+# load map
+sim = lgsvl.Simulator(os.environ.get("SIMULATOR_HOST", "127.0.0.1"), 8181)
+if sim.current_scene == "BorregasAve":
+  sim.reset()
+else:
+  sim.load("BorregasAve")
+
+spawns = sim.get_spawn()
+
+# create vehicle (make sure you add Comfort Sensor to its sensors in WebUI)
+state = lgsvl.AgentState()
+state.transform = spawns[0]
+a = sim.add_agent("Lincoln2017MKZ (Apollo 5.0)", lgsvl.AgentType.EGO, state)
+
+# custom callback that will be assigned to agent
+def onCustom(agent, kind, context):
+  if kind == "comfort":
+    print("Comfort sensor callback!", context)
+  else:
+    # ignore other custom callbacks
+    pass
+
+# set callback & run simulation
+a.on_custom(onCustom)
+sim.run()
+```
+
 ## Copyright and License
 
 Copyright (c) 2019 LG Electronics, Inc.
