@@ -18,7 +18,7 @@ namespace Simulator.Sensors
     [SensorType("Comfort", new System.Type[] { })]
     public class ComfortSensor : SensorBase
     {
-        Rigidbody rigidbody;
+        new Rigidbody rigidbody;
 
         Vector3 position;
         Vector3 velocity;
