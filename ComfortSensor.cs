@@ -11,6 +11,7 @@ using Simulator.Bridge;
 using Simulator.Sensors;
 using Simulator.Sensors.UI;
 using Simulator.Utilities;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Simulator.Sensors
@@ -127,9 +128,20 @@ namespace Simulator.Sensors
         public override void OnBridgeSetup(IBridge bridge)
         {
         }
-
         public override void OnVisualize(Visualizer visualizer)
         {
+            var graphData = new Dictionary<string, object>()
+            {
+                { "velocity", velocity.magnitude },
+                { "acceleration", accel.magnitude },
+                { "jerk", jerk.magnitude },
+                { "angularVelocity", angularVelocity },
+                { "angularAcceleration", angularAcceleration },
+                { "roll", transform.rotation.eulerAngles.z },
+                { "slip", slip }
+            };
+
+            visualizer.UpdateGraphValues(graphData);
         }
 
         public override void OnVisualizeToggle(bool state)
