@@ -6,7 +6,8 @@ To use this Sensor Plugin:
 
 1) clone the Sensor Plugin repo into Assets/External/Sensors as Assets/External/Sensors/ComfortSensor inside of your Simulator Unity Project
 
-2) build the Sensor Plugin for use with the Simulator, navigate to the `Simulator -> Build Sensors` Unity Editor menu item. Clicking on it will build every custom sensor in the Assets/External/Sensors directory and will output built Sensor Plugin bundles to the AssetBundles/Sensors folder
+2) build the Sensor Plugin for use with the Simulator, navigate to the `Simulator -> Build...` Unity Editor menu item and select custom sensor plugins on build window  
+Clicking `Build` button will build selected custom sensor in the Assets/External/Sensors directory and will output built Sensor Plugin bundles to the AssetBundles/Sensors folder
 
 3) on simulation startup, the Simulator will load all custom Sensor Plugin bundles in AssetBundles/Sensors directory and will be a valid sensor in a vehicle's configuration JSON
 
