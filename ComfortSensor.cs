@@ -8,7 +8,6 @@
 using SimpleJSON;
 using Simulator.Api;
 using Simulator.Bridge;
-using Simulator.Sensors;
 using Simulator.Sensors.UI;
 using Simulator.Utilities;
 using System.Collections.Generic;
@@ -45,9 +44,30 @@ namespace Simulator.Sensors
         public float slipTolerance;
         public float slip;
 
+        private IBridge Bridge;
+        private IWriter<ComfortData> Writer;
+
         private void Start()
         {
             rigidbody = transform.parent.GetComponentInChildren<Rigidbody>();
+        }
+
+        private void AddRosWriter(IBridge bridge)
+        {
+            Bridge = bridge;
+            Writer = Bridge.AddCustomWriter<ComfortData, ComfortBridgeData>(Topic, (c) =>
+            {
+                return new ComfortBridgeData
+                {
+                    converted_acceleration = c.acceleration,
+                    converted_angularAcceleration = c.angularAcceleration,
+                    converted_angularVelocity = c.angularVelocity,
+                    converted_jerk = c.jerk,
+                    converted_roll = c.roll,
+                    converted_slip = c.slip,
+                    converted_velocity = c.velocity
+                };
+            });
         }
 
         public void FixedUpdate()
@@ -147,5 +167,27 @@ namespace Simulator.Sensors
         public override void OnVisualizeToggle(bool state)
         {
         }
+    }
+
+    public class ComfortData
+    {
+        public float velocity;
+        public float acceleration;
+        public float jerk;
+        public float angularVelocity;
+        public float angularAcceleration;
+        public float roll;
+        public float slip;
+    }
+
+    public class ComfortBridgeData
+    {
+        public float converted_velocity;
+        public float converted_acceleration;
+        public float converted_jerk;
+        public float converted_angularVelocity;
+        public float converted_angularAcceleration;
+        public float converted_roll;
+        public float converted_slip;
     }
 }
