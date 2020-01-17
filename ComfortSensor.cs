@@ -54,56 +54,8 @@ namespace Simulator.Sensors
 
         public override void OnBridgeSetup(IBridge bridge)
         {
-            Debug.Log("Bridge Setup");
             Bridge = bridge;
-            if (Bridge.GetType() == typeof(Bridge.Ros.Bridge))
-            {
-                AddRosWriter();
-            }else if (Bridge.GetType() == typeof(Bridge.Cyber.Bridge))
-            {
-                AddCyberWriter();
-            }
-            else
-            {
-                Debug.LogError("Bridge not recognized");
-                throw new System.Exception("Writer for ComfortSensor not implemented");
-            }
-        }
-
-        private void AddCyberWriter()
-        {
-            Writer = Bridge.AddCustomWriter<ComfortData, cyber_ComfortBridgeData>(Topic, (c) =>
-            {
-                return new cyber_ComfortBridgeData
-                {
-                    converted_acceleration = c.acceleration,
-                    converted_angularAcceleration = c.angularAcceleration,
-                    converted_angularVelocity = c.angularVelocity,
-                    converted_jerk = c.jerk,
-                    converted_roll = c.roll,
-                    converted_slip = c.slip,
-                    converted_velocity = c.velocity
-                };
-            });
-        }
-
-        private void AddRosWriter()
-        {
-            Debug.Log("Adding writer to Ros Bridge");
-            Writer = Bridge.AddCustomWriter<ComfortData, ros_ComfortBridgeData>(Topic, (c) =>
-            {
-                Debug.Log("Writing to Ros Bridge");
-                return new ros_ComfortBridgeData
-                {
-                    converted_acceleration = c.acceleration,
-                    converted_angularAcceleration = c.angularAcceleration,
-                    converted_angularVelocity = c.angularVelocity,
-                    converted_jerk = c.jerk,
-                    converted_roll = c.roll,
-                    converted_slip = c.slip,
-                    converted_velocity = c.velocity
-                };
-            });
+            Writer = Bridge.AddWriter<ComfortData>(Topic);
         }
 
         public void FixedUpdate()
@@ -216,41 +168,5 @@ namespace Simulator.Sensors
         public override void OnVisualizeToggle(bool state)
         {
         }
-    }
-
-    [Bridge.Ros.MessageType("lgsvl_msgs/ComfortData")]
-    public class ComfortData
-    {
-        public float velocity;
-        public float acceleration;
-        public float jerk;
-        public float angularVelocity;
-        public float angularAcceleration;
-        public float roll;
-        public float slip;
-    }
-
-    [Bridge.Ros.MessageType("lgsvl_msgs/ros_ComfortBridgeData")]
-    public class ros_ComfortBridgeData
-    {
-        public float converted_velocity;
-        public float converted_acceleration;
-        public float converted_jerk;
-        public float converted_angularVelocity;
-        public float converted_angularAcceleration;
-        public float converted_roll;
-        public float converted_slip;
-    }
-
-    [Bridge.Ros.MessageType("lgsvl_msgs/cyber_ComfortBridgeData")]
-    public class cyber_ComfortBridgeData
-    {
-        public float converted_velocity;
-        public float converted_acceleration;
-        public float converted_jerk;
-        public float converted_angularVelocity;
-        public float converted_angularAcceleration;
-        public float converted_roll;
-        public float converted_slip;
     }
 }
