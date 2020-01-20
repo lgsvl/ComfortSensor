@@ -57,7 +57,7 @@ namespace Simulator.Sensors
         {
             Bridge = bridge;
             Writer = Bridge.AddWriter<ComfortData>(Topic);
-            //Bridge.AddReader<ComfortData>(Topic, data => Detected = data.acceleration);
+            Bridge.AddReader<ComfortData>(Topic, data => Detected = data.acceleration);
         }
 
         public void FixedUpdate()
