@@ -9,9 +9,9 @@ using System;
 
 namespace Simulator.Sensors
 {
-    public class ComfortDataConverters : IBridgeConverter<ComfortData>
+    public class ComfortDataConverters : IDataConverter<ComfortData>
     {
-        public Func<ComfortData, object> GetWriter(IBridge bridge)
+        public Func<ComfortData, object> GetConverter(IBridge bridge)
         {
             if (bridge.GetType() == typeof(Bridge.Ros.Bridge))
             {
@@ -47,13 +47,6 @@ namespace Simulator.Sensors
             }
 
             throw new System.Exception("ComfortSensor not implemented for this bridge type!");
-
-            return null;
-        }
-
-        public Func<object, ComfortData> GetReader(IBridge bridge)
-        {
-            return null;
         }
 
         public Type GetOutputType(IBridge bridge)
@@ -68,8 +61,6 @@ namespace Simulator.Sensors
             }
 
             throw new System.Exception("ComfortSensor not implemented for this bridge type!");
-
-            return null;
         }
 
     }

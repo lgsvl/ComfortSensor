@@ -43,6 +43,7 @@ namespace Simulator.Sensors
         [SensorParameter]
         public float slipTolerance;
         public float slip;
+        public float Detected;
 
         private IBridge Bridge;
         private IWriter<ComfortData> Writer;
@@ -56,6 +57,7 @@ namespace Simulator.Sensors
         {
             Bridge = bridge;
             Writer = Bridge.AddWriter<ComfortData>(Topic);
+            //Bridge.AddReader<ComfortData>(Topic, data => Detected = data.acceleration);
         }
 
         public void FixedUpdate()
