@@ -46,6 +46,7 @@ namespace Simulator.Sensors
 
     }
 
+    [Bridge.Ros.MessageType("lgsvl_msgs/ComfortData")]
     public class ComfortData
     {
         public Vector3 velocity;
@@ -56,7 +57,6 @@ namespace Simulator.Sensors
         public float roll;
         public float slip;
     }
-
 
     [Bridge.Ros.MessageType("lgsvl_msgs/ComfortData")]
     public class ros_ComfortBridgeData
