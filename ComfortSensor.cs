@@ -57,7 +57,7 @@ namespace Simulator.Sensors
         {
             Bridge = bridge;
             Writer = Bridge.AddWriter<ComfortData>(Topic);
-            Bridge.AddReader<ComfortData>(Topic, data => Detected = data.acceleration);
+            Bridge.AddReader<ComfortData>(Topic, data => Detected = data.acceleration.magnitude);
         }
 
         public void FixedUpdate()
@@ -85,9 +85,9 @@ namespace Simulator.Sensors
                     Debug.Log("Writing to existing bridge");
                     Writer.Write(new ComfortData()
                     {
-                        velocity = velocity.magnitude,
-                        acceleration = accel.magnitude,
-                        jerk = jerk.magnitude,
+                        velocity = velocity,
+                        acceleration = accel,
+                        jerk = jerk,
                         angularVelocity = angularVelocity,
                         angularAcceleration = angularAcceleration,
                         roll = transform.rotation.eulerAngles.z,

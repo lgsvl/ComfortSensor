@@ -6,6 +6,7 @@
 */
 using Simulator.Bridge;
 using System;
+using UnityEngine;
 
 namespace Simulator.Sensors
 {
@@ -19,29 +20,13 @@ namespace Simulator.Sensors
                 {
                     return new ros_ComfortBridgeData
                     {
-                        converted_acceleration = c.acceleration,
-                        converted_angularAcceleration = c.angularAcceleration,
-                        converted_angularVelocity = c.angularVelocity,
-                        converted_jerk = c.jerk,
-                        converted_roll = c.roll,
-                        converted_slip = c.slip,
-                        converted_velocity = c.velocity
-                    };
-                };
-            }
-            else if (bridge.GetType() == typeof(Bridge.Cyber.Bridge))
-            {
-                return (c) =>
-                {
-                    return new cyber_ComfortBridgeData
-                    {
-                        converted_acceleration = c.acceleration,
-                        converted_angularAcceleration = c.angularAcceleration,
-                        converted_angularVelocity = c.angularVelocity,
-                        converted_jerk = c.jerk,
-                        converted_roll = c.roll,
-                        converted_slip = c.slip,
-                        converted_velocity = c.velocity
+                        acceleration = c.acceleration.magnitude,
+                        angularAcceleration = c.angularAcceleration,
+                        angularVelocity = c.angularVelocity,
+                        jerk = c.jerk.magnitude,
+                        roll = c.roll,
+                        slip = c.slip,
+                        velocity = c.velocity.magnitude
                     };
                 };
             }
@@ -55,22 +40,17 @@ namespace Simulator.Sensors
             {
                 return typeof(ros_ComfortBridgeData);
             }
-            else if (bridge.GetType() == typeof(Bridge.Cyber.Bridge))
-            {
-                return typeof(cyber_ComfortBridgeData);
-            }
 
             throw new System.Exception("ComfortSensor not implemented for this bridge type!");
         }
 
     }
 
-    [Bridge.Ros.MessageType("lgsvl_msgs/ComfortData")]
     public class ComfortData
     {
-        public float velocity;
-        public float acceleration;
-        public float jerk;
+        public Vector3 velocity;
+        public Vector3 acceleration;
+        public Vector3 jerk;
         public float angularVelocity;
         public float angularAcceleration;
         public float roll;
@@ -81,23 +61,12 @@ namespace Simulator.Sensors
     [Bridge.Ros.MessageType("lgsvl_msgs/ComfortData")]
     public class ros_ComfortBridgeData
     {
-        public float converted_velocity;
-        public float converted_acceleration;
-        public float converted_jerk;
-        public float converted_angularVelocity;
-        public float converted_angularAcceleration;
-        public float converted_roll;
-        public float converted_slip;
-    }
-
-    public class cyber_ComfortBridgeData
-    {
-        public float converted_velocity;
-        public float converted_acceleration;
-        public float converted_jerk;
-        public float converted_angularVelocity;
-        public float converted_angularAcceleration;
-        public float converted_roll;
-        public float converted_slip;
+        public float velocity;
+        public float acceleration;
+        public float jerk;
+        public float angularVelocity;
+        public float angularAcceleration;
+        public float roll;
+        public float slip;
     }
 }
