@@ -45,6 +45,22 @@ Example sensor config JSON:
 }
 ```
 
+# Custom Message
+
+To implement custom messages, contained in a given Sensor Plugin project there must be an IDataConverter<Type> implementation. In this example project this is contained in ComfortData.cs
+
+The interface requires the following functions to be implemented:
+
+```public Func<ComfortData, object> GetConverter(IBridge bridge);```
+
+Which provides the type conversion functions from the Sensor Plugin into the appropriate types for writing to the bridge
+
+```public Type GetOutputType(IBridge bridge)```
+
+Which provides the type expected for a reader implemented with the Sensor Plugin to convert into its implemented type
+
+The IDataConverter is automatically loaded by the bridge on startup and will allow the Sensor Plugin to read/write custom messages to/from the bridge as long as in the sensor's OnBridgeSetup callback AddWriter() and AddReader() are called respectively 
+
 # Python API example
 
 Sensor will be calling `custom` callback in Python API with `kind` set to `comfort`.
