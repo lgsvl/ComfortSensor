@@ -4,49 +4,13 @@
  * This software contains code licensed as described in LICENSE.
  *
 */
-using Simulator.Bridge;
-using System;
+
 using UnityEngine;
+using Simulator.Bridge;
 
 namespace Simulator.Sensors
 {
-    public class ComfortDataConverters : IDataConverter<ComfortData>
-    {
-        public Func<ComfortData, object> GetConverter(IBridge bridge)
-        {
-            if (bridge.GetType() == typeof(Bridge.Ros.Bridge))
-            {
-                return (c) =>
-                {
-                    return new ros_ComfortBridgeData
-                    {
-                        acceleration = c.acceleration.magnitude,
-                        angularAcceleration = c.angularAcceleration,
-                        angularVelocity = c.angularVelocity,
-                        jerk = c.jerk.magnitude,
-                        roll = c.roll,
-                        slip = c.slip,
-                        velocity = c.velocity.magnitude
-                    };
-                };
-            }
-
-            throw new System.Exception("ComfortSensor not implemented for this bridge type!");
-        }
-
-        public Type GetOutputType(IBridge bridge)
-        {
-            if (bridge.GetType() == typeof(Bridge.Ros.Bridge))
-            {
-                return typeof(ros_ComfortBridgeData);
-            }
-
-            throw new System.Exception("ComfortSensor not implemented for this bridge type!");
-        }
-
-    }
-
-    [Bridge.Ros.MessageType("lgsvl_msgs/ComfortData")]
+    // generic non bridge specific data type that is produced by sensor
     public class ComfortData
     {
         public Vector3 velocity;
@@ -58,6 +22,8 @@ namespace Simulator.Sensors
         public float slip;
     }
 
+    // actual ROS type
+    // can use anything from Simulator.Bridge.Ros.Ros namespace
     [Bridge.Ros.MessageType("lgsvl_msgs/ComfortData")]
     public class ros_ComfortBridgeData
     {
@@ -68,5 +34,30 @@ namespace Simulator.Sensors
         public float angularAcceleration;
         public float roll;
         public float slip;
+    }
+
+    public class ComfortDataBridgePlugin : ISensorBridgePlugin
+    {
+        public void Register(IBridgePlugin plugin)
+        {
+            if (plugin.Factory is Bridge.Ros.RosBridgeFactoryBase)
+            {
+                // ROS factory default RegPublisher method performs two actions:
+                // 1) registers ComfortData type as supported data type for sensors
+                // 2) registers converter (ComfortData => ros_ComoftBridgeData) for creating publishers
+                plugin.Factory.RegPublisher(plugin,
+                    (ComfortData data) => new ros_ComfortBridgeData()
+                    {
+                        acceleration = data.acceleration.magnitude,
+                        angularAcceleration = data.angularAcceleration,
+                        angularVelocity = data.angularVelocity,
+                        jerk = data.jerk.magnitude,
+                        roll = data.roll,
+                        slip = data.slip,
+                        velocity = data.velocity.magnitude,
+                    }
+                );
+            }
+        }
     }
 }

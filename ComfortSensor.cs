@@ -45,19 +45,19 @@ namespace Simulator.Sensors
         public float slip;
         public float Detected;
 
-        private IBridge Bridge;
-        private IWriter<ComfortData> Writer;
+        private BridgeInstance Bridge;
+        private Publisher<ComfortData> Publish;
 
         private void Start()
         {
             rigidbody = transform.parent.GetComponentInChildren<Rigidbody>();
         }
 
-        public override void OnBridgeSetup(IBridge bridge)
+        public override void OnBridgeSetup(BridgeInstance bridge)
         {
             Bridge = bridge;
-            Writer = Bridge.AddWriter<ComfortData>(Topic);
-            Bridge.AddReader<ComfortData>(Topic, data => Detected = data.acceleration.magnitude);
+            Publish = Bridge.AddPublisher<ComfortData>(Topic);
+            Bridge.AddSubscriber<ComfortData>(Topic, data => Detected = data.acceleration.magnitude);
         }
 
         public void FixedUpdate()
@@ -83,7 +83,7 @@ namespace Simulator.Sensors
                 if (Bridge != null && Bridge.Status == Status.Connected)
                 {
                     Debug.Log("Writing to existing bridge");
-                    Writer.Write(new ComfortData()
+                    Publish(new ComfortData()
                     {
                         velocity = velocity,
                         acceleration = accel,
