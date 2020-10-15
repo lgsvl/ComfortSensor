@@ -6,10 +6,12 @@
  */
 
 using SimpleJSON;
+using Simulator.Analysis;
 using Simulator.Api;
 using Simulator.Bridge;
 using Simulator.Sensors.UI;
 using Simulator.Utilities;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,6 +22,10 @@ namespace Simulator.Sensors
     {
         new Rigidbody rigidbody;
 
+        float prevSpeed;
+        float speed;
+        float steerAngle;
+        float prevSteerAngle;
         Vector3 position;
         Vector3 velocity;
         Vector3 accel;
@@ -28,6 +34,10 @@ namespace Simulator.Sensors
         public float maxAccelAllowed;
         [SensorParameter]
         public float maxJerkAllowed;
+        [SensorParameter]
+        public float maxBrakeAllowed;
+        [SensorParameter]
+        public float maxSuddenSteerAllowed = 10f;
 
         Quaternion rotation;
         float angularVelocity;
@@ -47,10 +57,14 @@ namespace Simulator.Sensors
 
         private BridgeInstance Bridge;
         private Publisher<ComfortData> Publish;
+        private AgentController AgentController;
+        private IVehicleDynamics Dynamics;
 
         private void Start()
         {
             rigidbody = transform.parent.GetComponentInChildren<Rigidbody>();
+            AgentController = GetComponentInParent<AgentController>();
+            Dynamics = GetComponentInParent<IVehicleDynamics>();
         }
 
         public override void OnBridgeSetup(BridgeInstance bridge)
@@ -99,6 +113,20 @@ namespace Simulator.Sensors
 
         public void CalculateValues()
         {
+            prevSpeed = speed;
+            speed = rigidbody.velocity.magnitude;
+            if (Mathf.Abs(prevSpeed - speed) > maxBrakeAllowed)
+            {
+                SuddenBrakeEvent(AgentController.GTID);
+            }
+
+            prevSteerAngle = steerAngle;
+            steerAngle = Dynamics.WheelAngle;
+            if (Mathf.Abs(prevSteerAngle - steerAngle) > maxSuddenSteerAllowed)
+            {
+                SuddenSteerEvent(AgentController.GTID);
+            }
+
             Vector3 posDelta = rigidbody.velocity;
             Vector3 velocityDelta = (posDelta - velocity) / Time.fixedDeltaTime;
             Vector3 accelDelta = (velocityDelta - accel) / Time.fixedDeltaTime;
@@ -145,6 +173,7 @@ namespace Simulator.Sensors
 
             if (minSlipVelocity > 0 && slipTolerance > 0 && velocity.magnitude > minSlipVelocity && slip > slipTolerance)
             {
+                SuddenSteerEvent(AgentController.GTID);
                 return false;
             }
 
@@ -165,6 +194,31 @@ namespace Simulator.Sensors
             };
 
             visualizer.UpdateGraphValues(graphData);
+        }
+
+
+        private void SuddenBrakeEvent(uint id)
+        {
+            Hashtable data = new Hashtable
+            {
+                { "Id", id },
+                { "Type", "SuddenBrake" },
+                { "Time", SimulatorManager.Instance.GetSessionElapsedTimeSpan().ToString() },
+                { "Status", AnalysisManager.AnalysisStatusType.Failed },
+            };
+            SimulatorManager.Instance.AnalysisManager.AddEvent(data);
+        }
+
+        private void SuddenSteerEvent(uint id)
+        {
+            Hashtable data = new Hashtable
+            {
+                { "Id", id },
+                { "Type", "SuddenSteer" },
+                { "Time", SimulatorManager.Instance.GetSessionElapsedTimeSpan().ToString() },
+                { "Status", AnalysisManager.AnalysisStatusType.Failed },
+            };
+            SimulatorManager.Instance.AnalysisManager.AddEvent(data);
         }
 
         public override void OnVisualizeToggle(bool state)
