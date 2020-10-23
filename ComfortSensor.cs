@@ -31,27 +31,27 @@ namespace Simulator.Sensors
         Vector3 accel;
         Vector3 jerk;
         [SensorParameter]
-        public float maxAccelAllowed;
+        public float MaxAccelAllowed;
         [SensorParameter]
-        public float maxJerkAllowed;
+        public float MaxJerkAllowed;
         [SensorParameter]
-        public float maxBrakeAllowed;
+        public float MaxBrakeAllowed;
         [SensorParameter]
-        public float maxSuddenSteerAllowed = 10f;
+        public float MaxSuddenSteerAllowed = 10f;
 
         Quaternion rotation;
         float angularVelocity;
         float angularAcceleration;
         [SensorParameter]
-        public float maxAngularVelocityAllowed;
+        public float MaxAngularVelocityAllowed;
         [SensorParameter]
-        public float maxAngularAccelerationAllowed;
+        public float MaxAngularAccelerationAllowed;
         [SensorParameter]
-        public float rollTolerance;
+        public float RollTolerance;
         [SensorParameter]
-        public float minSlipVelocity;
+        public float MinSlipVelocity;
         [SensorParameter]
-        public float slipTolerance;
+        public float SlipTolerance;
         public float slip;
         public float Detected;
 
@@ -115,14 +115,14 @@ namespace Simulator.Sensors
         {
             prevSpeed = speed;
             speed = rigidbody.velocity.magnitude;
-            if (Mathf.Abs(prevSpeed - speed) > maxBrakeAllowed)
+            if (Mathf.Abs(prevSpeed - speed) > MaxBrakeAllowed)
             {
                 SuddenBrakeEvent(AgentController.GTID);
             }
 
             prevSteerAngle = steerAngle;
             steerAngle = Dynamics.WheelAngle;
-            if (Mathf.Abs(prevSteerAngle - steerAngle) > maxSuddenSteerAllowed)
+            if (Mathf.Abs(prevSteerAngle - steerAngle) > MaxSuddenSteerAllowed)
             {
                 SuddenSteerEvent(AgentController.GTID);
             }
@@ -144,34 +144,34 @@ namespace Simulator.Sensors
 
         public bool IsWithinRange()
         {
-            if (maxAccelAllowed > 0 && accel.magnitude > maxAccelAllowed)
+            if (MaxAccelAllowed > 0 && accel.magnitude > MaxAccelAllowed)
             {
                 return false;
             }
 
-            if (maxJerkAllowed > 0 && jerk.magnitude > maxJerkAllowed)
+            if (MaxJerkAllowed > 0 && jerk.magnitude > MaxJerkAllowed)
             {
                 return false;
             }
 
-            if (maxAngularVelocityAllowed > 0 && angularVelocity > maxAngularVelocityAllowed)
+            if (MaxAngularVelocityAllowed > 0 && angularVelocity > MaxAngularVelocityAllowed)
             {
                 return false;
             }
 
-            if (maxAngularAccelerationAllowed > 0 && angularAcceleration > maxAngularAccelerationAllowed)
+            if (MaxAngularAccelerationAllowed > 0 && angularAcceleration > MaxAngularAccelerationAllowed)
             {
                 return false;
             }
 
             float zAxis = transform.rotation.eulerAngles.z;
             float roll = zAxis < 180 ? zAxis : Mathf.Abs(zAxis - 360);
-            if (rollTolerance > 0 && roll > rollTolerance)
+            if (RollTolerance > 0 && roll > RollTolerance)
             {
                 return false;
             }
 
-            if (minSlipVelocity > 0 && slipTolerance > 0 && velocity.magnitude > minSlipVelocity && slip > slipTolerance)
+            if (MinSlipVelocity > 0 && SlipTolerance > 0 && velocity.magnitude > MinSlipVelocity && slip > SlipTolerance)
             {
                 SuddenSteerEvent(AgentController.GTID);
                 return false;
