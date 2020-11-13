@@ -115,14 +115,14 @@ namespace Simulator.Sensors
         {
             prevSpeed = speed;
             speed = rigidbody.velocity.magnitude;
-            if (Mathf.Abs(prevSpeed - speed) > MaxBrakeAllowed)
+            if (MaxBrakeAllowed > 0 && prevSpeed > speed && Mathf.Abs(prevSpeed - speed) > MaxBrakeAllowed)
             {
                 SuddenBrakeEvent(AgentController.GTID);
             }
 
             prevSteerAngle = steerAngle;
             steerAngle = Dynamics.WheelAngle;
-            if (Mathf.Abs(prevSteerAngle - steerAngle) > MaxSuddenSteerAllowed)
+            if (MaxSuddenSteerAllowed > 0 && Mathf.Abs(prevSteerAngle - steerAngle) > MaxSuddenSteerAllowed)
             {
                 SuddenSteerEvent(AgentController.GTID);
             }
