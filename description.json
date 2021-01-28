@@ -1,0 +1,15 @@
+{
+  "name": "Comfort Sensor",
+  "accessType": "public",
+  "description": "Basic Sensor Plugin Sensor Template Showing if certain Acceleration and Rotation values are out of acceptable ranges. \nFind more information here: https://github.com/lgsvl/ComfortSensor",
+  "licenseName": "LG Content",
+  "copyright": "LG Electronics Inc.",
+  "tags": [
+    {
+      "name": "LG"
+    },
+    {
+      "name": "Extra"
+    }
+  ]
+}
