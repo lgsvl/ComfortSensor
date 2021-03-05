@@ -11,6 +11,7 @@ using Simulator.Api;
 using Simulator.Bridge;
 using Simulator.Sensors.UI;
 using Simulator.Utilities;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -72,6 +73,10 @@ namespace Simulator.Sensors
             Bridge = bridge;
             Publish = Bridge.AddPublisher<ComfortData>(Topic);
             Bridge.AddSubscriber<ComfortData>(Topic, data => Detected = data.acceleration.magnitude);
+        }
+        public override Type GetDataBridgePlugin()
+        {
+            return typeof(ComfortDataBridgePlugin);
         }
 
         public void FixedUpdate()
