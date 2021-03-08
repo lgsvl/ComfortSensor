@@ -70,6 +70,11 @@ namespace Simulator.Sensors
 
         public override void OnBridgeSetup(BridgeInstance bridge)
         {
+            if (bridge.Plugin.Factory is Bridge.Cyber.CyberBridgeFactory)
+            {
+                return;
+            }
+
             Bridge = bridge;
             Publish = Bridge.AddPublisher<ComfortData>(Topic);
             Bridge.AddSubscriber<ComfortData>(Topic, data => Detected = data.acceleration.magnitude);
