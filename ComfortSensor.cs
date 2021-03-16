@@ -32,11 +32,11 @@ namespace Simulator.Sensors
         Vector3 accel;
         Vector3 jerk;
         [SensorParameter]
-        public float MaxAccelAllowed;
+        public float MaxAccelAllowed = 10f;
         [SensorParameter]
-        public float MaxJerkAllowed;
+        public float MaxJerkAllowed = 10f;
         [SensorParameter]
-        public float MaxBrakeAllowed;
+        public float MaxBrakeAllowed = 10f;
         [SensorParameter]
         public float MaxSuddenSteerAllowed = 10f;
 
@@ -44,15 +44,15 @@ namespace Simulator.Sensors
         float angularVelocity;
         float angularAcceleration;
         [SensorParameter]
-        public float MaxAngularVelocityAllowed;
+        public float MaxAngularVelocityAllowed = 10f;
         [SensorParameter]
-        public float MaxAngularAccelerationAllowed;
+        public float MaxAngularAccelerationAllowed = 10f;
         [SensorParameter]
-        public float RollTolerance;
+        public float RollTolerance = 10f;
         [SensorParameter]
-        public float MinSlipVelocity;
+        public float MinSlipVelocity = 10f;
         [SensorParameter]
-        public float SlipTolerance;
+        public float SlipTolerance = 10f;
         public float slip;
         public float Detected;
 
@@ -90,7 +90,7 @@ namespace Simulator.Sensors
 
             if (!IsWithinRange())
             {
-                Debug.Log("Outside of Range");
+                Debug.Log("ComfortSensor is Outside of Range");
                 var jsonData = new JSONObject();
                 jsonData.Add("velocity", velocity.magnitude);
                 jsonData.Add("acceleration", accel.magnitude);
