@@ -46,9 +46,15 @@ MonoBehaviour:
   Name: Comfort
   Topic: 
   Frame: 
-  maxAccelAllowed: 0
-  maxJerkAllowed: 0
-  positionFramesCalculated: 0
-  maxRotationAllowed: 0
-  maxRotationAccelAllowed: 0
-  rotationFramesCalculated: 0
+  ParentTransform: {fileID: 0}
+  MaxAccelAllowed: 10
+  MaxJerkAllowed: 10
+  MaxBrakeAllowed: 10
+  MaxSuddenSteerAllowed: 10
+  MaxAngularVelocityAllowed: 10
+  MaxAngularAccelerationAllowed: 10
+  RollTolerance: 10
+  MinSlipVelocity: 10
+  SlipTolerance: 10
+  slip: 0
+  Detected: 0
