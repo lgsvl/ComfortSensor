@@ -21,8 +21,6 @@ namespace Simulator.Sensors
     [SensorType("Comfort", new System.Type[] { typeof(ComfortData) })]
     public class ComfortSensor : SensorBase
     {
-        new Rigidbody rigidbody;
-
         float prevSpeed;
         float speed;
         float steerAngle;
@@ -58,14 +56,15 @@ namespace Simulator.Sensors
 
         private BridgeInstance Bridge;
         private Publisher<ComfortData> Publish;
-        private AgentController AgentController;
+        private IAgentController Controller;
         private IVehicleDynamics Dynamics;
 
         private void Start()
         {
-            rigidbody = transform.parent.GetComponentInChildren<Rigidbody>();
-            AgentController = GetComponentInParent<AgentController>();
+            Controller = GetComponentInParent<IAgentController>();
             Dynamics = GetComponentInParent<IVehicleDynamics>();
+            position = transform.position;
+            rotation = transform.rotation;
         }
 
         public override void OnBridgeSetup(BridgeInstance bridge)
@@ -79,6 +78,7 @@ namespace Simulator.Sensors
             Publish = Bridge.AddPublisher<ComfortData>(Topic);
             Bridge.AddSubscriber<ComfortData>(Topic, data => Detected = data.acceleration.magnitude);
         }
+
         public override Type GetDataBridgePlugin()
         {
             return typeof(ComfortDataBridgePlugin);
@@ -86,6 +86,9 @@ namespace Simulator.Sensors
 
         public void FixedUpdate()
         {
+            if (Time.timeScale == 0f)
+                return;
+
             CalculateValues();
 
             if (!IsWithinRange())
@@ -99,6 +102,7 @@ namespace Simulator.Sensors
                 jsonData.Add("angularAcceleration", angularAcceleration);
                 jsonData.Add("roll", transform.rotation.eulerAngles.z);
                 jsonData.Add("slip", slip);
+
                 if (ApiManager.Instance != null)
                 {
                     ApiManager.Instance.AddCustom(transform.parent.gameObject, "comfort", jsonData);
@@ -124,20 +128,20 @@ namespace Simulator.Sensors
         public void CalculateValues()
         {
             prevSpeed = speed;
-            speed = rigidbody.velocity.magnitude;
+            speed = Dynamics.Velocity.magnitude;
             if (MaxBrakeAllowed > 0 && prevSpeed > speed && Mathf.Abs(prevSpeed - speed) > MaxBrakeAllowed)
             {
-                SuddenBrakeEvent(AgentController.GTID);
+                SuddenBrakeEvent(Controller.GTID);
             }
 
             prevSteerAngle = steerAngle;
             steerAngle = Dynamics.WheelAngle;
             if (MaxSuddenSteerAllowed > 0 && Mathf.Abs(prevSteerAngle - steerAngle) > MaxSuddenSteerAllowed)
             {
-                SuddenSteerEvent(AgentController.GTID);
+                SuddenSteerEvent(Controller.GTID);
             }
 
-            Vector3 posDelta = rigidbody.velocity;
+            Vector3 posDelta = Dynamics.Velocity;
             Vector3 velocityDelta = (posDelta - velocity) / Time.fixedDeltaTime;
             Vector3 accelDelta = (velocityDelta - accel) / Time.fixedDeltaTime;
             jerk = accelDelta;
@@ -149,28 +153,32 @@ namespace Simulator.Sensors
             angularAcceleration = angularVelocityDelta;
             angularVelocity = angleDelta;
             rotation = transform.rotation;
-            slip = Vector3.Angle(rigidbody.velocity, transform.forward);
+            slip = Vector3.Angle(Dynamics.Velocity, transform.forward);
         }
 
         public bool IsWithinRange()
         {
             if (MaxAccelAllowed > 0 && accel.magnitude > MaxAccelAllowed)
             {
+                Debug.Log($"MaxAccel {MaxAccelAllowed} / value {accel.magnitude}");
                 return false;
             }
 
             if (MaxJerkAllowed > 0 && jerk.magnitude > MaxJerkAllowed)
             {
+                Debug.Log($"MaxJerk {MaxJerkAllowed} / value {jerk.magnitude}");
                 return false;
             }
 
             if (MaxAngularVelocityAllowed > 0 && angularVelocity > MaxAngularVelocityAllowed)
             {
+                Debug.Log($"MaxAngVel {MaxAngularVelocityAllowed} / value {angularVelocity}");
                 return false;
             }
 
             if (MaxAngularAccelerationAllowed > 0 && angularAcceleration > MaxAngularAccelerationAllowed)
             {
+                Debug.Log($"MaxAngAccel {MaxAngularAccelerationAllowed} / value {angularAcceleration}");
                 return false;
             }
 
@@ -178,12 +186,14 @@ namespace Simulator.Sensors
             float roll = zAxis < 180 ? zAxis : Mathf.Abs(zAxis - 360);
             if (RollTolerance > 0 && roll > RollTolerance)
             {
+                Debug.Log($"Roll {RollTolerance} / value {RollTolerance}");
                 return false;
             }
 
             if (MinSlipVelocity > 0 && SlipTolerance > 0 && velocity.magnitude > MinSlipVelocity && slip > SlipTolerance)
             {
-                SuddenSteerEvent(AgentController.GTID);
+                Debug.Log($"MinSlipVel {MinSlipVelocity} / value {velocity.magnitude}    SlipTolerance {SlipTolerance} / value {slip}");
+                SuddenSteerEvent(Controller.GTID);
                 return false;
             }
 
