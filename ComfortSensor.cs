@@ -59,12 +59,17 @@ namespace Simulator.Sensors
         private IAgentController Controller;
         private IVehicleDynamics Dynamics;
 
-        private void Start()
+        protected override void Initialize()
         {
             Controller = GetComponentInParent<IAgentController>();
             Dynamics = GetComponentInParent<IVehicleDynamics>();
             position = transform.position;
             rotation = transform.rotation;
+        }
+
+        protected override void Deinitialize()
+        {
+            
         }
 
         public override void OnBridgeSetup(BridgeInstance bridge)
