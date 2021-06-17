@@ -24,7 +24,7 @@ namespace Simulator.Sensors
 
     // actual ROS type
     // can use anything from Simulator.Bridge.Ros.Ros namespace
-    [Bridge.Ros.MessageType("lgsvl_msgs/ComfortData")]
+    [Bridge.MessageType("lgsvl_msgs/ComfortData")]
     public class ros_ComfortBridgeData
     {
         public float velocity;
@@ -40,7 +40,7 @@ namespace Simulator.Sensors
     {
         public void Register(IBridgePlugin plugin)
         {
-            if (plugin.Factory is Bridge.Ros.RosBridgeFactoryBase)
+            if (plugin.GetBridgeNameAttribute().Name == "ROS")
             {
                 // ROS factory default RegPublisher method performs two actions:
                 // 1) registers ComfortData type as supported data type for sensors
