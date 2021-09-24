@@ -105,7 +105,7 @@ namespace Simulator.Sensors
 
         public override void OnBridgeSetup(BridgeInstance bridge)
         {
-            if (bridge.Plugin.GetBridgeNameAttribute().Name == "CyberRT")
+            if (bridge.Plugin.GetBridgeNameAttribute().Type == "CyberRT")
             {
                 return;
             }
